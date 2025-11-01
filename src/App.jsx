@@ -6,35 +6,31 @@ function App() {
   const [weatherData, setWeatherData] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const API_KEY = "YOUR_API_KEY"; // Replace with your actual WeatherAPI key
+  const API_KEY = "879fa0a8db0b481f91d102735250111"; // Replace with actual WeatherAPI key
 
   const handleSearch = async () => {
     if (!city.trim()) return;
+
     setWeatherData(null);
     setLoading(true);
 
     try {
-      const response = await fetch(
+      const res = await fetch(
         `https://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${city}`
       );
+      const data = await res.json();
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch");
-      }
-
-      const data = await response.json();
-
-      if (data && data.current) {
+      if (data.error) {
+        alert("Failed to fetch weather data");
+      } else {
         setWeatherData({
-          temp: data.current.temp_c,
+          temperature: data.current.temp_c,
           humidity: data.current.humidity,
           condition: data.current.condition.text,
-          wind: data.current.wind_kph,
+          windSpeed: data.current.wind_kph,
         });
-      } else {
-        alert("Failed to fetch weather data");
       }
-    } catch (error) {
+    } catch (err) {
       alert("Failed to fetch weather data");
     } finally {
       setLoading(false);
@@ -43,13 +39,12 @@ function App() {
 
   return (
     <div className="app">
-      <h2>Weather App</h2>
       <div className="search-bar">
         <input
           type="text"
+          placeholder="Enter city name"
           value={city}
           onChange={(e) => setCity(e.target.value)}
-          placeholder="Enter city name"
         />
         <button onClick={handleSearch}>Search</button>
       </div>
@@ -61,7 +56,7 @@ function App() {
           <>
             <div className="weather-card">
               <h3>Temperature</h3>
-              <p>{weatherData.temp} °C</p>
+              <p>{weatherData.temperature} °C</p>
             </div>
             <div className="weather-card">
               <h3>Humidity</h3>
@@ -73,7 +68,7 @@ function App() {
             </div>
             <div className="weather-card">
               <h3>Wind Speed</h3>
-              <p>{weatherData.wind} km/h</p>
+              <p>{weatherData.windSpeed} km/h</p>
             </div>
           </>
         )}
